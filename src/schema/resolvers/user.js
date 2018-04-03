@@ -1,9 +1,14 @@
 /* @flow */
 
-import { hashSync } from 'bcrypt';
+import { formatErrors, tryLogin, type Context } from '../utils';
 
-type CreateUserArgs = {
+type RegisterArgs = {
   username: string,
+  email: string,
+  password: string,
+};
+
+type LoginArgs = {
   email: string,
   password: string,
 };
@@ -22,10 +27,35 @@ export default {
     },
   },
   Mutation: {
-    register: (source: mixed, { password, ...otherArgs }: CreateUserArgs, { models }: Object) => {
-      const hashedPassword = hashSync(password, 10);
+    login: (
+      source: mixed,
+      { email, password }: LoginArgs,
+      { models, SECRET, SECRET2 }: Context
+    ) => {
+      return tryLogin(email, password, models, SECRET, SECRET2);
+    },
+    register: async (source: mixed, args: RegisterArgs, { models }: Object) => {
+      try {
+        if (args.password.length > 5 && args.password.length < 100) {
+          const message = 'The password must be between 5 and 100 characters long';
+          return {
+            success: false,
+            errors: [{ path: 'password', message }],
+          };
+        }
 
-      return models.User.create({ ...otherArgs, password: hashedPassword });
+        const user = await models.User.create(args);
+
+        return {
+          success: true,
+          user,
+        };
+      } catch (e) {
+        return {
+          success: false,
+          errors: formatErrors(e, models),
+        };
+      }
     },
   },
 };
