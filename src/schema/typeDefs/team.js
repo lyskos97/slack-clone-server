@@ -13,7 +13,13 @@ export default `
     teams: [Team!]
   }
 
+  type CreateTeamResponse {
+    success: Boolean!
+    team: Team
+    errors: [Error!]
+  }
+
   type Mutation {
-    createTeam(name: String!, owner: Int!): Team!
+    createTeam(name: String!, owner: Int!): CreateTeamResponse!
   }
 `;

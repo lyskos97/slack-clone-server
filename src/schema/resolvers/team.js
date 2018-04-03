@@ -1,3 +1,5 @@
+import { type Context, formatErrors } from '../utils';
+
 /* @flow */
 
 type GetTeamArgs = {
@@ -18,8 +20,14 @@ export default {
     },
   },
   Mutation: {
-    createTeam: (source: mixed, args: CreateTeamArgs, { models }: Object) => {
-      return models.Team.create(args);
+    createTeam: async (source: mixed, args: CreateTeamArgs, { models, user }: Context) => {
+      try {
+        const team = await models.Team.create({ ...args, owner: user.id });
+
+        return { success: true, team };
+      } catch (e) {
+        return { success: false, errors: formatErrors(e) };
+      }
     },
   },
 };
