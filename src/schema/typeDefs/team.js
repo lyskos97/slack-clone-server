@@ -20,6 +20,6 @@ export default `
   }
 
   type Mutation {
-    createTeam(name: String!, owner: Int!): CreateTeamResponse!
+    createTeam(name: String!): CreateTeamResponse!
   }
 `;

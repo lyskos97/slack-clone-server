@@ -42,6 +42,8 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
+app.use(addUser);
+
 app.use(
   '/',
   cors(),
